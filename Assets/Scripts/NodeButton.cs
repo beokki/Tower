@@ -16,6 +16,7 @@ public class NodeButton : MonoBehaviour
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] TMP_Text text;
     [SerializeField] int bonusHP = 1;
+
     LineRenderer lineRenderer;
     NodeState currentState = NodeState.Unavailable;
 
