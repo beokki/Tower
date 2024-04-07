@@ -40,10 +40,10 @@ public class GameManager : MonoBehaviour
         {
             for (int i = 0; i < 5; i++)
             {
-                yield return new WaitForSeconds(0.6f);
+                yield return new WaitForSeconds(0.5f);
                 Instantiate(enemyPrefab, spawnTile.transform.position, Quaternion.identity);
             }
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1f);
         }
     }
 }
