@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     const int row = 10;
 
     public GameTile TargetTile { get; internal set; }
+    List<GameTile> pathEnd = new List<GameTile>();
 
     private void Awake()
     {
@@ -39,7 +40,6 @@ public class GameManager : MonoBehaviour
 
         spawnTile = tiles[1, 8];
         spawnTile.SetEnemySpawn();
-        //StartCoroutine(SpawnEnemyCoroutine());
     }
 
     private void Update()
@@ -56,9 +56,12 @@ public class GameManager : MonoBehaviour
             
             while (tile != null)
             {
+                pathEnd.Add(tile);
                 tile.SetPath(true);
                 tile = path[tile];
             }
+
+            StartCoroutine(SpawnEnemyCoroutine());
         }
     }
 
@@ -135,7 +138,8 @@ public class GameManager : MonoBehaviour
             for (int i = 0; i < 5; i++)
             {
                 yield return new WaitForSeconds(0.5f);
-                Instantiate(enemyPrefab, spawnTile.transform.position, Quaternion.identity);
+                var enemy = Instantiate(enemyPrefab, spawnTile.transform.position, Quaternion.identity);
+                enemy.GetComponent<Enemy>().SetPath(pathEnd);
             }
             yield return new WaitForSeconds(1f);
         }
