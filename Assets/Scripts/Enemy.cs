@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
 
     public static HashSet<Enemy> enemies = new HashSet<Enemy>();
 
-    private Stack<GameTile> path = new Stack<GameTile>();
+    private readonly Stack<GameTile> path = new Stack<GameTile>();
 
     internal void SetPath(List<GameTile> pathEnd)
     {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] GameObject tilePrefab;
     [SerializeField] GameObject enemyPrefab;
+    [SerializeField] TMP_Text waveText;
 
     GameTile[,] tiles;
     private GameTile spawnTile;
@@ -15,13 +17,24 @@ public class GameManager : MonoBehaviour
     const int row = 10;
 
     public GameTile TargetTile { get; internal set; }
-    List<GameTile> pathEnd = new List<GameTile>();
+    readonly List<GameTile> pathEnd = new List<GameTile>();
 
-    private int initEnemyCount = 10;
-    private int currentWave = 0;
+    private readonly int initEnemyCount = 10;
+    private int currentWave = 1;
+
+    public static GameManager instance;
 
     private void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         tiles = new GameTile[column, row];
 
         for (int x = 0; x < column; x++)
@@ -138,15 +151,57 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
-            int currentEnemyCount = initEnemyCount * (int)Mathf.Pow(2, currentWave);
-            for (int i = 0; i < currentEnemyCount; i++)
-            {
-                yield return new WaitForSeconds(0.5f);
-                var enemy = Instantiate(enemyPrefab, spawnTile.transform.position, Quaternion.identity);
-                enemy.GetComponent<Enemy>().SetPath(pathEnd);
-            }
+            yield return StartCoroutine(SpawnEnemyWave());
+            yield return new WaitUntil(() => Enemy.enemies.Count == 0);
             currentWave++;
-            yield return new WaitForSeconds(10f);
+            UpdateWaveText(currentWave);
+            yield return new WaitForSeconds(3f);
         }
+    }
+
+    IEnumerator SpawnEnemyWave()
+    {
+        int currentEnemyCount = initEnemyCount * (int)Mathf.Pow(1.25f, currentWave);
+
+        for (int i = 0; i < currentEnemyCount; i++)
+        {
+            yield return new WaitForSeconds(0.5f);
+            var enemy = Instantiate(enemyPrefab, spawnTile.transform.position, Quaternion.identity);
+            var e = enemy.GetComponent<Enemy>();
+            e.SetPath(pathEnd);
+            e.hp = 50 * (int)Mathf.Pow(1.25f, currentWave);
+        }
+    }
+
+    private void UpdateWaveText(int v)
+    {
+        if (waveText != null)
+        {
+            waveText.text = $"Wave: {v}";
+        }
+    }
+
+    public void ClearEnemies()
+    {
+        foreach (var enemy in new HashSet<Enemy>(Enemy.enemies))
+        {
+            Destroy(enemy.gameObject);
+        }
+        Enemy.enemies.Clear();
+    }
+
+    public void Defeated()
+    {
+        Player.instance.ResetHealth();
+        ClearEnemies();
+        pathEnd.Clear();
+        ResetWave();
+    }
+
+    public void ResetWave()
+    {
+        StopAllCoroutines();
+        currentWave = 1;
+        UpdateWaveText(currentWave);
     }
 }

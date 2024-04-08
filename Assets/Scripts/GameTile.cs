@@ -18,6 +18,10 @@ public class GameTile : MonoBehaviour,
 
     private Color originalColor;
 
+    [SerializeField] private int damage = 10;
+    [SerializeField] private float fireRate = 1f;
+    private float fireCooldown = 0f;
+
     public GameManager GM { get; internal set; }
     public int X { get; internal set; }
     public int Y { get; internal set; }
@@ -39,11 +43,39 @@ public class GameTile : MonoBehaviour,
     {
         if (turretRenderer.enabled)
         {
-                EnemyTarget();
+            Rotate();
+
+            if (fireCooldown <= 0f)
+            {
+                Shoot();
+                fireCooldown = 1f / fireRate;
+            }
+            else
+            {
+                fireCooldown -= Time.deltaTime;
+            }
         }
     }
 
-    private void EnemyTarget()
+    private void Rotate()
+    {
+        Enemy target = CloseEnemy();
+        if (target != null)
+        {
+            Vector3 targetDir = target.transform.position - transform.position;
+            float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
+            turretRenderer.transform.rotation = Quaternion.Euler(0, 0, angle - 90);
+
+
+            lineRenderer.SetPosition(1, target.transform.position);
+        }
+        else
+        {
+            lineRenderer.enabled = false;
+        }
+    }
+
+    private Enemy CloseEnemy()
     {
         Enemy target = null;
         float closeDistance = Mathf.Infinity;
@@ -57,15 +89,18 @@ public class GameTile : MonoBehaviour,
                 closeDistance = distance;
             }
         }
+        return target;
+    }
+
+    private void Shoot()
+    {
+        Enemy target = CloseEnemy();
 
         if (target != null)
         {
-            Vector3 targetDir = target.transform.position - transform.position;
-            float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
-            turretRenderer.transform.rotation = Quaternion.Euler(0, 0, angle - 90);
-
-            lineRenderer.SetPosition(1, target.transform.position);
             lineRenderer.enabled = true;
+
+            target.TakeDamage(damage);
         }
         else
         {

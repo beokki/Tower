@@ -22,13 +22,25 @@ public class Player : MonoBehaviour
             Destroy(gameObject);
         }
 
-        health = health + bonusHP;
+        health += bonusHP;
         hpText.text = $"HP: {health}";
     }
 
     public void TakeDamage(int damage)
     {
         health -= damage;
+        hpText.text = $"HP: {health}";
+
+        if (health <= 0)
+        {
+            GameManager.instance.Defeated();
+        }
+    }
+
+    public void ResetHealth()
+    {
+        health = 10;
+        health += bonusHP;
         hpText.text = $"HP: {health}";
     }
 }
