@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public int hp = 50;
+
     public static HashSet<Enemy> enemies = new HashSet<Enemy>();
 
     private Stack<GameTile> path = new Stack<GameTile>();
@@ -36,8 +38,22 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            enemies.Remove(this);
-            Destroy(gameObject);
+            Die();
+            Player.instance.TakeDamage(1);
         }
+    }
+    public void TakeDamage(int damage)
+    {
+        hp -= damage;
+        if (hp <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        enemies.Remove(this);
+        Destroy(gameObject);
     }
 }
