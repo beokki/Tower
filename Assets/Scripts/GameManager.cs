@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour
     public GameTile TargetTile { get; internal set; }
     List<GameTile> pathEnd = new List<GameTile>();
 
+    private int initEnemyCount = 10;
+    private int currentWave = 0;
+
     private void Awake()
     {
         tiles = new GameTile[column, row];
@@ -135,13 +138,15 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
-            for (int i = 0; i < 5; i++)
+            int currentEnemyCount = initEnemyCount * (int)Mathf.Pow(2, currentWave);
+            for (int i = 0; i < currentEnemyCount; i++)
             {
                 yield return new WaitForSeconds(0.5f);
                 var enemy = Instantiate(enemyPrefab, spawnTile.transform.position, Quaternion.identity);
                 enemy.GetComponent<Enemy>().SetPath(pathEnd);
             }
-            yield return new WaitForSeconds(1f);
+            currentWave++;
+            yield return new WaitForSeconds(10f);
         }
     }
 }

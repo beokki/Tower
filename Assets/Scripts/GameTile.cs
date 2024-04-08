@@ -39,32 +39,37 @@ public class GameTile : MonoBehaviour,
     {
         if (turretRenderer.enabled)
         {
-            Enemy target = null;
-            float closeDistance = Mathf.Infinity;
+                EnemyTarget();
+        }
+    }
 
-            foreach (var enemy in Enemy.enemies)
-            {
-                float distance = Vector3.Distance(transform.position, enemy.transform.position);
-                if (distance < 2 && distance < closeDistance)
-                {
-                    target = enemy;
-                    closeDistance = distance;
-                }
-            }
+    private void EnemyTarget()
+    {
+        Enemy target = null;
+        float closeDistance = Mathf.Infinity;
 
-            if (target != null)
+        foreach (var enemy in Enemy.enemies)
+        {
+            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+            if (distance < 2 && distance < closeDistance)
             {
-                Vector3 targetDir = target.transform.position - transform.position;
-                float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
-                turretRenderer.transform.rotation = Quaternion.Euler(0, 0, angle - 90);
+                target = enemy;
+                closeDistance = distance;
+            }
+        }
 
-                lineRenderer.SetPosition(1, target.transform.position);
-                lineRenderer.enabled = true;
-            }
-            else
-            {
-                lineRenderer.enabled = false;
-            }
+        if (target != null)
+        {
+            Vector3 targetDir = target.transform.position - transform.position;
+            float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
+            turretRenderer.transform.rotation = Quaternion.Euler(0, 0, angle - 90);
+
+            lineRenderer.SetPosition(1, target.transform.position);
+            lineRenderer.enabled = true;
+        }
+        else
+        {
+            lineRenderer.enabled = false;
         }
     }
 
