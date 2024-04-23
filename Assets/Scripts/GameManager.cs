@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject enemyPrefab;
     [SerializeField] TMP_Text waveText;
     [SerializeField] TMP_Text enemyText;
+    [SerializeField] TMP_Text killText;
 
     GameTile[,] tiles;
     private GameTile spawnTile;
@@ -22,6 +23,7 @@ public class GameManager : MonoBehaviour
 
     private int initEnemyCount = 5;
     private int currentWave = 1;
+    private int killedCount = 0;
 
     public static GameManager instance;
 
@@ -203,6 +205,14 @@ public class GameManager : MonoBehaviour
             enemyText.text = $"Enemy: {Enemy.enemies.Count}";
     }
 
+    private void UpdateKilledText()
+    {
+        if (killText != null)
+        {
+            killText.text = $"Killed: {killedCount}";
+        }
+    }
+
     public void EnemySpawned()
     {
         UpdateEnemyText();
@@ -210,6 +220,8 @@ public class GameManager : MonoBehaviour
 
     public void EnemyDefeated()
     {
+        killedCount++;
+        UpdateKilledText();
         UpdateEnemyText();
     }
 
