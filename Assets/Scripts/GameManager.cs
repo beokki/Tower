@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject tilePrefab;
     [SerializeField] GameObject enemyPrefab;
     [SerializeField] TMP_Text waveText;
+    [SerializeField] TMP_Text enemyText;
 
     GameTile[,] tiles;
     private GameTile spawnTile;
@@ -19,7 +20,7 @@ public class GameManager : MonoBehaviour
     public GameTile TargetTile { get; internal set; }
     readonly List<GameTile> pathEnd = new List<GameTile>();
 
-    private readonly int initEnemyCount = 10;
+    private int initEnemyCount = 5;
     private int currentWave = 1;
 
     public static GameManager instance;
@@ -161,7 +162,9 @@ public class GameManager : MonoBehaviour
 
     IEnumerator SpawnEnemyWave()
     {
-        int currentEnemyCount = initEnemyCount * (int)Mathf.Pow(1.25f, currentWave);
+        Difficulty();
+
+        int currentEnemyCount = initEnemyCount * (int)Mathf.Pow(1f, currentWave);
 
         for (int i = 0; i < currentEnemyCount; i++)
         {
@@ -169,7 +172,20 @@ public class GameManager : MonoBehaviour
             var enemy = Instantiate(enemyPrefab, spawnTile.transform.position, Quaternion.identity);
             var e = enemy.GetComponent<Enemy>();
             e.SetPath(pathEnd);
-            e.hp = 50 * (int)Mathf.Pow(1.25f, currentWave);
+            e.hp = 20 * (int)Mathf.Pow(1f, currentWave);
+            EnemySpawned();
+        }
+    }
+
+    private void Difficulty()
+    {
+        if (Player.instance.health > Player.instance.health * 0.75)
+        {
+            initEnemyCount += 1;
+        }
+        else if (Player.instance.health < Player.instance.health * 0.5)
+        {
+            initEnemyCount = Mathf.Max(initEnemyCount - 1, 5);
         }
     }
 
@@ -179,6 +195,22 @@ public class GameManager : MonoBehaviour
         {
             waveText.text = $"Wave: {v}";
         }
+    }
+
+    private void UpdateEnemyText()
+    {
+        if (enemyText != null)
+            enemyText.text = $"Enemy: {Enemy.enemies.Count}";
+    }
+
+    public void EnemySpawned()
+    {
+        UpdateEnemyText();
+    }
+
+    public void EnemyDefeated()
+    {
+        UpdateEnemyText();
     }
 
     public void ClearEnemies()
@@ -203,5 +235,6 @@ public class GameManager : MonoBehaviour
         StopAllCoroutines();
         currentWave = 1;
         UpdateWaveText(currentWave);
+        UpdateEnemyText();
     }
 }

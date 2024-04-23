@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
 {
     [SerializeField] TMP_Text hpText;
 
-    private int health = 10;
+    public int health = 10;
     public static int bonusHP = 0;
     public static Player instance;
 
