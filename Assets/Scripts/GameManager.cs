@@ -166,7 +166,7 @@ public class GameManager : MonoBehaviour
     {
         Difficulty();
 
-        int currentEnemyCount = initEnemyCount * (int)Mathf.Pow(1f, currentWave);
+        int currentEnemyCount = initEnemyCount * (int)Mathf.Pow(1.1f, currentWave);
 
         for (int i = 0; i < currentEnemyCount; i++)
         {
@@ -174,7 +174,8 @@ public class GameManager : MonoBehaviour
             var enemy = Instantiate(enemyPrefab, spawnTile.transform.position, Quaternion.identity);
             var e = enemy.GetComponent<Enemy>();
             e.SetPath(pathEnd);
-            e.hp = 20 * (int)Mathf.Pow(1f, currentWave);
+            e.hp = 20 * (int)Mathf.Pow(1.1f, currentWave);
+            e.speed = 2f * (int)Mathf.Pow(1.05f, currentWave);
             EnemySpawned();
         }
     }

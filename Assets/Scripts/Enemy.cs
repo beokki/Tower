@@ -13,6 +13,8 @@ public class Enemy : MonoBehaviour
     public Color fullHP = Color.green;
     public Color lowHP = Color.red;
 
+    public float speed = 2f;
+
     private readonly Stack<GameTile> path = new Stack<GameTile>();
 
     internal void SetPath(List<GameTile> pathEnd)
@@ -36,7 +38,7 @@ public class Enemy : MonoBehaviour
         if (path.Count > 0)
         {
             Vector3 desPos = path.Peek().transform.position;
-            transform.position = Vector3.MoveTowards(transform.position, desPos, 2 * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, desPos, speed * Time.deltaTime);
 
             if (Vector3.Distance(transform.position, desPos) < 0.01f)
             {

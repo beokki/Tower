@@ -83,7 +83,7 @@ public class GameTile : MonoBehaviour,
         foreach (var enemy in Enemy.enemies)
         {
             float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            if (distance < 2 && distance < closeDistance)
+            if (distance <= 2 && distance < closeDistance)
             {
                 target = enemy;
                 closeDistance = distance;
