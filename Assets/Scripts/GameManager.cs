@@ -8,7 +8,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] GameObject tilePrefab;
-    [SerializeField] GameObject enemyPrefab;
+    [SerializeField] private List<GameObject> enemyPrefab;
     [SerializeField] TMP_Text waveText;
     [SerializeField] TMP_Text enemyText;
     [SerializeField] TMP_Text killText;
@@ -171,7 +171,8 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < currentEnemyCount; i++)
         {
             yield return new WaitForSeconds(0.5f);
-            var enemy = Instantiate(enemyPrefab, spawnTile.transform.position, Quaternion.identity);
+            GameObject enemyPrefabs = enemyPrefab[currentWave % enemyPrefab.Count];
+            var enemy = Instantiate(enemyPrefabs, spawnTile.transform.position, Quaternion.identity);
             var e = enemy.GetComponent<Enemy>();
             e.SetPath(pathEnd);
             e.hp = 20 * (int)Mathf.Pow(1.1f, currentWave);

@@ -420,7 +420,7 @@ Transform:
   m_GameObject: {fileID: 676355699}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.5, y: 5, z: -10}
+  m_LocalPosition: {x: 10.8, y: 5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1034,7 +1034,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 8065308846829448205, guid: cfb93050bbba1234ebadd92a2a7753c6, type: 3}
-  enemyPrefab: {fileID: 4563322033792602315, guid: 21f8472dcc616864796b90544189b862, type: 3}
+  enemyPrefab:
+  - {fileID: 4563322033792602315, guid: 21f8472dcc616864796b90544189b862, type: 3}
+  - {fileID: 5570394153221894316, guid: 445c4a8265389a44592c06f131d7b9c3, type: 3}
+  - {fileID: 5019536028284510455, guid: 93f158160f6cef946b54acbfa6e0ca6a, type: 3}
+  - {fileID: 3584375868930954074, guid: f78d60c682594d24e8fd630827d243cc, type: 3}
+  - {fileID: 6574987716744870797, guid: f7e523296b31c5b40926db8ec52d64da, type: 3}
   waveText: {fileID: 1432018795}
   enemyText: {fileID: 2007609089}
   killText: {fileID: 1793124450}
