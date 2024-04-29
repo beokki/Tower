@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_Text waveText;
     [SerializeField] TMP_Text enemyText;
     [SerializeField] TMP_Text killText;
+    [SerializeField] TMP_Text hpText;
 
     GameTile[,] tiles;
     private GameTile spawnTile;
@@ -21,11 +22,16 @@ public class GameManager : MonoBehaviour
     public GameTile TargetTile { get; internal set; }
     readonly List<GameTile> pathEnd = new List<GameTile>();
 
-    private int initEnemyCount = 5;
-    private int currentWave = 1;
-    private int killedCount = 0;
+    public int initEnemyCount = 5;
+    public int currentWave = 1;
+    public int killedCount = 0;
 
     public static GameManager instance;
+
+    private List<GameTile> activeTurrets = new List<GameTile>();
+
+    public GameObject skillTreeRoot;
+    public GameObject gameplayRoot;
 
     private void Awake()
     {
@@ -79,9 +85,32 @@ public class GameManager : MonoBehaviour
                 tile.SetPath(true);
                 tile = path[tile];
             }
-
-            StartCoroutine(SpawnEnemyCoroutine());
         }
+        else if (Input.GetKeyDown(KeyCode.RightShift))
+        {
+            StartCoroutine(SpawnEnemyWave());
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            ShowSkillTree();
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            ShowGameplay();
+        }
+    }
+
+    public void ShowGameplay()
+    {
+        gameplayRoot.SetActive(true);
+        skillTreeRoot.SetActive(false);
+    }
+
+    public void ShowSkillTree()
+    {
+        skillTreeRoot.SetActive(true);
+        gameplayRoot.SetActive(false);
     }
 
     private Dictionary<GameTile, GameTile> Pathfinding(GameTile srcTile, GameTile targetTile)
@@ -150,15 +179,26 @@ public class GameManager : MonoBehaviour
         return r;
     }
 
-    IEnumerator SpawnEnemyCoroutine()
+    //IEnumerator SpawnEnemyCoroutine()
+    //{
+    //    while (true)
+    //    {
+    //        yield return StartCoroutine(SpawnEnemyWave());
+    //        yield return new WaitUntil(() => Enemy.enemies.Count == 0);
+    //        currentWave++;
+    //        UpdateWaveText(currentWave);
+    //        yield return new WaitForSeconds(3f);
+    //    }
+    //}
+
+    public void StartNextWave()
     {
-        while (true)
+        if (Enemy.enemies.Count == 0)
         {
-            yield return StartCoroutine(SpawnEnemyWave());
-            yield return new WaitUntil(() => Enemy.enemies.Count == 0);
+            StartCoroutine(SpawnEnemyWave());
             currentWave++;
             UpdateWaveText(currentWave);
-            yield return new WaitForSeconds(3f);
+            //CheckNodes();
         }
     }
 
@@ -166,17 +206,17 @@ public class GameManager : MonoBehaviour
     {
         Difficulty();
 
-        int currentEnemyCount = initEnemyCount * (int)Mathf.Pow(1.1f, currentWave);
+        int currentEnemyCount = Mathf.CeilToInt(initEnemyCount * Mathf.Pow(1.25f, currentWave - 1));
 
         for (int i = 0; i < currentEnemyCount; i++)
         {
             yield return new WaitForSeconds(0.5f);
-            GameObject enemyPrefabs = enemyPrefab[currentWave % enemyPrefab.Count];
+            GameObject enemyPrefabs = enemyPrefab[UnityEngine.Random.Range(0, enemyPrefab.Count)];
             var enemy = Instantiate(enemyPrefabs, spawnTile.transform.position, Quaternion.identity);
             var e = enemy.GetComponent<Enemy>();
             e.SetPath(pathEnd);
-            e.hp = 20 * (int)Mathf.Pow(1.1f, currentWave);
-            e.speed = 2f * (int)Mathf.Pow(1.05f, currentWave);
+            e.hp = e.maxhp * (int)Mathf.Pow(1.25f, currentWave);
+            //e.speed = e.speed * (int)Mathf.Pow(1.25f, currentWave);
             EnemySpawned();
         }
     }
@@ -207,12 +247,10 @@ public class GameManager : MonoBehaviour
             enemyText.text = $"Enemy: {Enemy.enemies.Count}";
     }
 
-    private void UpdateKilledText()
+    private void UpdateKilledText(int v)
     {
         if (killText != null)
-        {
-            killText.text = $"Killed: {killedCount}";
-        }
+            killText.text = $"Killed: {v}";
     }
 
     public void EnemySpawned()
@@ -223,32 +261,76 @@ public class GameManager : MonoBehaviour
     public void EnemyDefeated()
     {
         killedCount++;
-        UpdateKilledText();
+        UpdateKilledText(killedCount);
         UpdateEnemyText();
     }
 
-    public void ClearEnemies()
+    //public void ClearEnemies()
+    //{
+    //    foreach (var enemy in new HashSet<Enemy>(Enemy.enemies))
+    //    {
+    //        Destroy(enemy.gameObject);
+    //    }
+    //    Enemy.enemies.Clear();
+    //}
+
+    //public void Defeated()
+    //{
+    //    Player.instance.ResetHealth();
+    //    ClearEnemies();
+    //    pathEnd.Clear();
+    //    ResetWave();
+    //}
+
+    //public void ResetWave()
+    //{
+    //    StopAllCoroutines();
+    //    currentWave = 1;
+    //    UpdateWaveText(currentWave);
+    //    UpdateEnemyText();
+    //    UpdateKilledText(0);
+    //}
+
+    //public void CheckNodes()
+    //{
+    //    foreach (NodeButton node in FindObjectsOfType<NodeButton>())
+    //    {
+    //        if (node.currentState == NodeButton.NodeState.Unavailable)
+    //        {
+    //            node.SetState(NodeButton.NodeState.Available);
+    //        }
+    //    }
+    //}
+
+    public void RegisterTurret(GameTile turret)
     {
-        foreach (var enemy in new HashSet<Enemy>(Enemy.enemies))
+        if (!activeTurrets.Contains(turret))
         {
-            Destroy(enemy.gameObject);
+            activeTurrets.Add(turret);
         }
-        Enemy.enemies.Clear();
     }
 
-    public void Defeated()
+    public void UnregisterTurret(GameTile turret)
     {
-        Player.instance.ResetHealth();
-        ClearEnemies();
-        pathEnd.Clear();
-        ResetWave();
+        activeTurrets.Remove(turret);
     }
 
-    public void ResetWave()
+    public void ApplyBonusToTurrets(Action<GameTile> apply)
     {
-        StopAllCoroutines();
-        currentWave = 1;
-        UpdateWaveText(currentWave);
-        UpdateEnemyText();
+        foreach (GameTile turret in activeTurrets)
+        {
+            apply(turret);
+        }
+    }
+
+    public void UpdateHealth(int amount)
+    {
+        Player.bonusHP = amount;
+        UpdateHPUI();
+    }
+
+    private void UpdateHPUI()
+    {
+        hpText.text = $"HP: {Player.instance.health + Player.bonusHP}";
     }
 }

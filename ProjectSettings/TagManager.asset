@@ -11,8 +11,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Gameplay
+  - Skill Tree
   - 
   - 
   - 
@@ -40,4 +40,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Gameplay
+    uniqueID: 1134230383
+    locked: 0
+  - name: Skill Tree
+    uniqueID: 1734992213
+    locked: 0
+  - name: UI
+    uniqueID: 3287132419
     locked: 0

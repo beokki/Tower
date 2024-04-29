@@ -132,8 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hp: 50
   maxhp: 50
-  fullHP: {r: 0, g: 1, b: 0, a: 1}
-  lowHP: {r: 1, g: 0, b: 0, a: 1}
+  speed: 1
 --- !u!212 &4798999460464365355
 SpriteRenderer:
   m_ObjectHideFlags: 0

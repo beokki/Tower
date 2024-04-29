@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -33,7 +34,7 @@ public class Player : MonoBehaviour
 
         if (health <= 0)
         {
-            GameManager.instance.Defeated();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 

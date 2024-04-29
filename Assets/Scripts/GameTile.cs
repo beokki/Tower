@@ -10,7 +10,7 @@ public class GameTile : MonoBehaviour,
     IPointerDownHandler
 {
     [SerializeField] SpriteRenderer hoverRenderer;
-    [SerializeField] SpriteRenderer turretRenderer;
+    [SerializeField] public SpriteRenderer turretRenderer;
     [SerializeField] SpriteRenderer spawnRenderer;
 
     private LineRenderer lineRenderer;
@@ -18,9 +18,10 @@ public class GameTile : MonoBehaviour,
 
     private Color originalColor;
 
-    [SerializeField] private int damage = 10;
-    [SerializeField] private float fireRate = 1f;
-    private float fireCooldown = 0f;
+    [SerializeField] public int damage = 10;
+    [SerializeField] public float fireRate = 1f;
+    [SerializeField] public float fireCooldown = 0f;
+    [SerializeField] public int range = 2;
 
     public GameManager GM { get; internal set; }
     public int X { get; internal set; }
@@ -83,7 +84,7 @@ public class GameTile : MonoBehaviour,
         foreach (var enemy in Enemy.enemies)
         {
             float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            if (distance <= 2 && distance < closeDistance)
+            if (distance <= range && distance < closeDistance)
             {
                 target = enemy;
                 closeDistance = distance;
@@ -129,6 +130,14 @@ public class GameTile : MonoBehaviour,
     {
         turretRenderer.enabled = !turretRenderer.enabled;
         IsBlocked = turretRenderer.enabled;
+        if (turretRenderer.enabled)
+        {
+            GameManager.instance.RegisterTurret(this);
+        }
+        else
+        {
+            GameManager.instance.UnregisterTurret(this);
+        }
     }
 
     internal void SetEnemySpawn()
@@ -139,5 +148,20 @@ public class GameTile : MonoBehaviour,
     internal void SetPath(bool isPath)
     {
         spriteRenderer.color = isPath ? Color.white : originalColor;
+    }
+
+    public void IncreaseDamage(int inc)
+    {
+        damage += inc;
+    }
+
+    public void IncreaseFR(float inc)
+    {
+        fireRate += inc;
+    }
+
+    public void IncreaseRange(int inc)
+    {
+        range += inc;
     }
 }

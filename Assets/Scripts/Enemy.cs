@@ -10,10 +10,10 @@ public class Enemy : MonoBehaviour
     public static HashSet<Enemy> enemies = new HashSet<Enemy>();
 
     private Renderer rend;
-    public Color fullHP = Color.green;
-    public Color lowHP = Color.red;
+    //public Color fullHP = Color.green;
+    //public Color lowHP = Color.red;
 
-    public float speed = 2f;
+    public float speed = 1f;
 
     private readonly Stack<GameTile> path = new Stack<GameTile>();
 
@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour
     {
         enemies.Add(this);
         rend = GetComponent<Renderer>();
-        rend.material.color = fullHP;
+        //rend.material.color = fullHP;
     }
 
     void Update()
@@ -54,7 +54,7 @@ public class Enemy : MonoBehaviour
     public void TakeDamage(int damage)
     {
         hp -= damage;
-        UpdateColor();
+        //UpdateColor();
         if (hp <= 0)
         {
             Die();
@@ -68,9 +68,9 @@ public class Enemy : MonoBehaviour
         GameManager.instance.EnemyDefeated();
     }
 
-    private void UpdateColor()
-    {
-        float hpratio = (float)hp / maxhp;
-        rend.material.color = Color.Lerp(lowHP, fullHP, hpratio);
-    }
+    //private void UpdateColor()
+    //{
+    //    float hpratio = (float)hp / maxhp;
+    //    rend.material.color = Color.Lerp(lowHP, fullHP, hpratio);
+    //}
 }
