@@ -25,4 +25,14 @@ public class SceneController : MonoBehaviour
     {
         GameManager.instance.ShowGameplay();
     }
+
+    public void GameplayScene()
+    {
+        SceneManager.LoadScene("Gameplay");
+    }
+
+    public void OnApplicationQuit()
+    {
+        Application.Quit();
+    }
 }
