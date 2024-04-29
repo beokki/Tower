@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_Text enemyText;
     [SerializeField] TMP_Text killText;
     [SerializeField] TMP_Text hpText;
+    [SerializeField] TMP_Text turretLimitText;
 
     GameTile[,] tiles;
     public GameTile spawnTile;
@@ -19,6 +20,8 @@ public class GameManager : MonoBehaviour
     const int row = 10;
 
     public GameTile TargetTile { get; internal set; }
+    public GameTile EndTile { get; private set; }
+
     readonly List<GameTile> pathEnd = new List<GameTile>();
 
     public int initEnemyCount = 5;
@@ -31,6 +34,15 @@ public class GameManager : MonoBehaviour
 
     public GameObject skillTreeRoot;
     public GameObject gameplayRoot;
+
+    public int currentTurretLimit = 10;
+    public int limitIncFreq = 2;
+    public int additionalTurretsInc = 5;
+
+    private void Start()
+    {
+        UpdateTurretLimitText();
+    }
 
     private void Awake()
     {
@@ -63,6 +75,7 @@ public class GameManager : MonoBehaviour
         }
 
         spawnTile = tiles[1, 8];
+        EndTile = tiles[16, 2];
         spawnTile.SetEnemySpawn();
     }
 
@@ -195,8 +208,7 @@ public class GameManager : MonoBehaviour
         if (Enemy.enemies.Count == 0)
         {
             StartCoroutine(SpawnEnemyWave());
-            currentWave++;
-            UpdateWaveText(currentWave);
+            WaveCompleted();
             //CheckNodes();
         }
     }
@@ -288,6 +300,7 @@ public class GameManager : MonoBehaviour
         UpdateWaveText(currentWave);
         UpdateEnemyText();
         UpdateKilledText(0);
+        UpdateTurretLimitText();
     }
 
     //public void CheckNodes()
@@ -303,15 +316,18 @@ public class GameManager : MonoBehaviour
 
     public void RegisterTurret(GameTile turret)
     {
-        if (!activeTurrets.Contains(turret))
+        if (activeTurrets.Count < currentTurretLimit && !activeTurrets.Contains(turret))
         {
             activeTurrets.Add(turret);
+            UpdateTurretLimitText();
         }
     }
 
     public void UnregisterTurret(GameTile turret)
     {
         activeTurrets.Remove(turret);
+        RecalculatePath();
+        UpdateTurretLimitText();
     }
 
     public void ApplyBonusToTurrets(Action<GameTile> apply)
@@ -331,5 +347,80 @@ public class GameManager : MonoBehaviour
     private void UpdateHPUI()
     {
         hpText.text = $"HP: {Player.instance.health += Player.bonusHP}";
+    }
+
+    public bool PlaceTurret(GameTile selectedTile)
+    {
+        if (activeTurrets.Count >= currentTurretLimit)
+        {
+            return false;
+        }
+
+        selectedTile.IsBlocked = true;
+
+        Dictionary<GameTile, GameTile> newPath = Pathfinding(spawnTile, EndTile);
+
+        if (newPath.Count == 0 || !newPath.ContainsKey(EndTile))
+        {
+            selectedTile.IsBlocked = false;
+            return false;
+        }
+        else
+        {
+            UpdatePathOnGrid(newPath);
+            RegisterTurret(selectedTile);
+            return true;
+        }
+    }
+
+    private void UpdatePathOnGrid(Dictionary<GameTile, GameTile> newPath)
+    {
+        foreach (var tiles in pathEnd)
+        {
+            tiles.SetPath(false);
+        }
+
+        pathEnd.Clear();
+        var tile = EndTile;
+        while (tile != spawnTile && tile != null)
+        {
+            pathEnd.Add(tile);
+            tile.SetPath(true);
+            tile = newPath[tile];
+        }
+    }
+
+    public void RecalculatePath()
+    {
+        foreach (GameTile tile in pathEnd)
+        {
+            tile.SetPath(false);
+        }
+        pathEnd.Clear();
+
+        var newPath = Pathfinding(spawnTile, EndTile);
+        if (newPath != null)
+        {
+            UpdatePathOnGrid(newPath);
+        }
+    }
+
+    public void WaveCompleted()
+    {
+        currentWave++;
+
+        if (currentWave % limitIncFreq == 0)
+        {
+            currentTurretLimit += additionalTurretsInc;
+            UpdateTurretLimitText();
+        }
+
+        UpdateWaveText(currentWave);
+    }
+
+    private void UpdateTurretLimitText()
+    {
+        if (turretLimitText != null)
+            turretLimitText.text = $"Turrets: {activeTurrets.Count}/{currentTurretLimit}";
     }
 }

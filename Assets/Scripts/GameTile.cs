@@ -25,7 +25,7 @@ public class GameTile : MonoBehaviour,
     public GameManager GM { get; internal set; }
     public int X { get; internal set; }
     public int Y { get; internal set; }
-    public bool IsBlocked { get; private set; }
+    public bool IsBlocked { get; internal set; }
 
     private void Awake()
     {
@@ -127,15 +127,21 @@ public class GameTile : MonoBehaviour,
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        turretRenderer.enabled = !turretRenderer.enabled;
-        IsBlocked = turretRenderer.enabled;
-        if (turretRenderer.enabled)
+        if (IsBlocked)
         {
-            GameManager.instance.RegisterTurret(this);
+            turretRenderer.enabled = false;
+            IsBlocked = false;
+            GameManager.instance.UnregisterTurret(this);
+            GameManager.instance.RecalculatePath();
         }
         else
         {
-            GameManager.instance.UnregisterTurret(this);
+            if (GameManager.instance.PlaceTurret(this))
+            {
+                turretRenderer.enabled = true;
+                IsBlocked = true;
+                GameManager.instance.RegisterTurret(this);
+            }
         }
     }
 
