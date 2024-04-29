@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -15,7 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_Text hpText;
 
     GameTile[,] tiles;
-    private GameTile spawnTile;
+    public GameTile spawnTile;
     const int column = 20;
     const int row = 10;
 
@@ -265,31 +264,31 @@ public class GameManager : MonoBehaviour
         UpdateEnemyText();
     }
 
-    //public void ClearEnemies()
-    //{
-    //    foreach (var enemy in new HashSet<Enemy>(Enemy.enemies))
-    //    {
-    //        Destroy(enemy.gameObject);
-    //    }
-    //    Enemy.enemies.Clear();
-    //}
+    public void ClearEnemies()
+    {
+        foreach (var enemy in new HashSet<Enemy>(Enemy.enemies))
+        {
+            Destroy(enemy.gameObject);
+        }
+        Enemy.enemies.Clear();
+    }
 
-    //public void Defeated()
-    //{
-    //    Player.instance.ResetHealth();
-    //    ClearEnemies();
-    //    pathEnd.Clear();
-    //    ResetWave();
-    //}
+    public void Defeated()
+    {
+        Player.instance.ResetHealth();
+        ClearEnemies();
+        pathEnd.Clear();
+        ResetWave();
+    }
 
-    //public void ResetWave()
-    //{
-    //    StopAllCoroutines();
-    //    currentWave = 1;
-    //    UpdateWaveText(currentWave);
-    //    UpdateEnemyText();
-    //    UpdateKilledText(0);
-    //}
+    public void ResetWave()
+    {
+        StopAllCoroutines();
+        currentWave = 1;
+        UpdateWaveText(currentWave);
+        UpdateEnemyText();
+        UpdateKilledText(0);
+    }
 
     //public void CheckNodes()
     //{
@@ -325,12 +324,12 @@ public class GameManager : MonoBehaviour
 
     public void UpdateHealth(int amount)
     {
-        Player.bonusHP = amount;
+        Player.instance.health += amount;
         UpdateHPUI();
     }
 
     private void UpdateHPUI()
     {
-        hpText.text = $"HP: {Player.instance.health + Player.bonusHP}";
+        hpText.text = $"HP: {Player.instance.health += Player.bonusHP}";
     }
 }

@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     [SerializeField] TMP_Text hpText;
 
     public int health = 10;
-    public static int bonusHP = 0;
+    public static int bonusHP;
     public static Player instance;
 
     private void Awake()

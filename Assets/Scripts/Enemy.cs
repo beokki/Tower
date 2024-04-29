@@ -9,7 +9,9 @@ public class Enemy : MonoBehaviour
 
     public static HashSet<Enemy> enemies = new HashSet<Enemy>();
 
-    private Renderer rend;
+    public GameObject deathEffect;
+
+    //private Renderer rend;
     //public Color fullHP = Color.green;
     //public Color lowHP = Color.red;
 
@@ -29,7 +31,7 @@ public class Enemy : MonoBehaviour
     private void Awake()
     {
         enemies.Add(this);
-        rend = GetComponent<Renderer>();
+        //rend = GetComponent<Renderer>();
         //rend.material.color = fullHP;
     }
 
@@ -39,6 +41,13 @@ public class Enemy : MonoBehaviour
         {
             Vector3 desPos = path.Peek().transform.position;
             transform.position = Vector3.MoveTowards(transform.position, desPos, speed * Time.deltaTime);
+
+            Vector3 direction = desPos - transform.position;
+            if (direction != Vector3.zero)
+            {
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle - 90));
+            }
 
             if (Vector3.Distance(transform.position, desPos) < 0.01f)
             {
@@ -63,6 +72,11 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
+        if (deathEffect)
+        {
+            Instantiate(deathEffect, transform.position, Quaternion.identity);
+        }
+
         enemies.Remove(this);
         Destroy(gameObject);
         GameManager.instance.EnemyDefeated();

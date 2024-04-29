@@ -2,7 +2,6 @@ using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static UnityEngine.GraphicsBuffer;
 
 public class GameTile : MonoBehaviour, 
     IPointerEnterHandler, 
@@ -111,7 +110,7 @@ public class GameTile : MonoBehaviour,
 
     internal void TurnGray()
     {
-        spriteRenderer.color = Color.gray;
+        spriteRenderer.color = new Color32(255, 255, 255, 5);
         originalColor = spriteRenderer.color;
     }
 
@@ -147,7 +146,7 @@ public class GameTile : MonoBehaviour,
 
     internal void SetPath(bool isPath)
     {
-        spriteRenderer.color = isPath ? Color.white : originalColor;
+        spriteRenderer.color = isPath ? new Color(255, 255, 255, 5) : originalColor;
     }
 
     public void IncreaseDamage(int inc)
